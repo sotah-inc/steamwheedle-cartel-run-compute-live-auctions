@@ -1,0 +1,48 @@
+steps:
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args: ['pull', 'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/build:latest']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-f', './build-env.Dockerfile',
+      '-t', 'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/build',
+#      '--cache-from', 'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/build:latest',
+      '.'
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'tag',
+      'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/build',
+      'steamwheedle-cartel/run-compute-live-auctions/build'
+    ]
+
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args: ['pull', 'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/runtime:latest']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-f', './runtime-env.Dockerfile',
+      '-t', 'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/runtime',
+#      '--cache-from', 'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/runtime:latest',
+      '.'
+    ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/runtime'
+    ]
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: [
+      'beta', 'run', 'deploy',
+      'run-compute-live-auctions',
+      '--image', 'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/runtime',
+      '--region', 'us-central1',
+      '--platform', 'managed',
+      '--no-allow-unauthenticated',
+      '--timeout', '120s',
+      '--concurrency', '200'
+    ]
+images: [
+  'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/build:latest',
+  'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/runtime:latest'
+]
