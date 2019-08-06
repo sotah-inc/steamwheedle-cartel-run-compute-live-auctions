@@ -41,7 +41,7 @@ steps:
       '--no-allow-unauthenticated',
       '--timeout', '120s',
       '--concurrency', '80',
-      '--memory', '512M'
+      '--memory', '512Mi'
     ]
 images: [
   'gcr.io/$PROJECT_ID/steamwheedle-cartel/run-compute-live-auctions/build:latest',
